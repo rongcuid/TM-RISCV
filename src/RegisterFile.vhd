@@ -24,40 +24,41 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
 --library UNISIM;
 --use UNISIM.VComponents.all;
-
+use work.Common.all;
 entity RegisterFile is
   Port (
-    -- 输入，地址 
+    clk : in std_logic;
+    -- Addr 
     rs1_addr : in unsigned(4 downto 0);
     rs2_addr : in unsigned(4 downto 0);
     rd_addr : in unsigned(4 downto 0);
-    -- 数据。
+    -- Data
     rs1_data : out std_logic_vector(31 downto 0);
     rs2_data : out std_logic_vector(31 downto 0);
     rd_data : in std_logic_vector(31 downto 0);
-    -- 控制
+    -- Control
     rd_wb : in std_logic
     );
 end RegisterFile;
 
 architecture Behavioral of RegisterFile is
-  -- 寄存器的宽度是32位
-  type reg_entry is std_logic_vector(31 downto 0);
-  -- RV32架构一共有32个寄存器,x0-x31。其中x0读写忽略
-  signal reg_data : array (1 to 31) of reg_entry;
+  -- 
+  type registerfile_t is array (1 to 31) of reg_entry_t;
+  -- 
+  signal reg_data : registerfile_t;
 
 begin
 
   regWrite: process (clk)
   begin
     if (rising_edge(clk)) then
-      -- 每一时钟周期，若rd_wb（rd端写入writeback）则写入
+      -- 
       if (rd_wb) then
         reg_data(rd_addr) <= rd_data;
       end if;
